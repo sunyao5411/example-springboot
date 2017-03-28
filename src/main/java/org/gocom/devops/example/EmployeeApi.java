@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -44,6 +45,7 @@ public class EmployeeApi {
 	private static String SQL_QUERY = "SELECT `id`, `no`, `name`, `mail`, `password`, `phone`, `gender` FROM `employee`";
 	
 	@RequestMapping(method = RequestMethod.POST)
+	@ResponseBody
 	public Employee add(@RequestBody Employee employee) throws ApiException {
 		if (null == employee || StringUtils.isBlank(employee.getMail())) {
 			return null;
@@ -71,6 +73,7 @@ public class EmployeeApi {
 	}
 	
 	@RequestMapping(method = RequestMethod.PUT)
+	@ResponseBody
 	public Employee update(@RequestBody Employee employee) throws ApiException {
 		if (null == employee || StringUtils.isBlank(employee.getMail())) {
 			return null;
@@ -95,6 +98,7 @@ public class EmployeeApi {
 	}
 	
 	@RequestMapping(value="/get", method = RequestMethod.GET)
+	@ResponseBody
 	public Employee get(@RequestParam("mail") String mail) throws ApiException {
 		if (StringUtils.isBlank(mail)) {
 			return null;
@@ -157,6 +161,7 @@ public class EmployeeApi {
 	}
 	
 	@RequestMapping(method = RequestMethod.DELETE)
+	@ResponseBody
 	public Employee remove(@RequestParam("mail") String mail) throws ApiException {
 		if (StringUtils.isBlank(mail)) {
 			return null;

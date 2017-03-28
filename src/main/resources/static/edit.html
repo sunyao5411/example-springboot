@@ -245,6 +245,7 @@ body {
 				},
 				error : function(result) {
 					console.log(result);
+					window.location.href = "index.html";
 				}
 			});
 			$("#confirm_dialog .actions .button.ok").off("click");

@@ -146,7 +146,7 @@ function validateEmail() {
 		return false;
 	}
 	$.ajax({
-		url : "api/employees/" + mail,
+		url : "api/employees/get/mail=" + mail,
 		method : "get",
 		contentType : "application/json; charset=UTF-8",
 		async: false,
@@ -229,6 +229,7 @@ function submit() {
 			},
 			error : function(result) {
 				console.log(result);
+				window.location.href = "index.html";
 			}
 		});
 		$("#confirm_dialog .actions .button.ok").off("click");
