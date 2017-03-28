@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport"
+	content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>DevOps Example WEB Application</title>
+<link rel="stylesheet" type="text/css"
+	href="assets/semantic/semantic.min.css">
+<script src="assets/library/jquery.min.js"></script>
+<script src="assets/semantic/semantic.min.js"></script>
+<style>
+body {
+	padding: 1em;
+}
+
+.ui.menu {
+	margin: 3em 0em;
+}
+
+.ui.menu:last-child {
+	margin-bottom: 110px;
+}
+</style>
+
+<!--- Example Javascript -->
+<script>
+	$(document).ready(function() {
+		$('.ui.menu .ui.dropdown').dropdown({
+			on : 'hover'
+		});
+		$('.ui.menu a.item').on('click', function() {
+			$(this).addClass('active').siblings().removeClass('active');
+			console.log($(this).attr("id"));
+		});
+	});
+
+	function signout() {
+		$.ajax({
+			url : "api/employees/signout",
+			method : "put",
+			contentType : "application/json; charset=UTF-8",
+			success : function(result) {
+				if (result == true || result == "true") {
+					window.location.href = "signin.html";
+				}
+			},
+			error : function(result) {
+				console.log(result);
+			}
+		});
+	}
+</script>
+</head>
+<body>
+	<div class="ui inverted menu">
+		<a class="item" id="home" href="index.html"><i class="home icon"></i>Home</a>
+		<div class="ui dropdown item">
+			System <i class="dropdown icon"></i>
+			<div class="menu">
+				<a class="item" href="system.html">Environment</a> <a class="item"
+					href="configuration.html">Configuration</a>
+			</div>
+		</div>
+		<div class="right menu">
+			<div class="item">
+				<div class="ui transparent inverted icon input">
+					<i class="search icon"></i> <input type="text" placeholder="Search">
+				</div>
+			</div>
+			<a class="item" onclick="signout(); return false;"><i
+				class="sign out icon"></i> Sign-out</a>
+		</div>
+	</div>
+
+	<div class="ui large breadcrumb">
+		<a class="section" href="index.html">Home</a> <i
+			class="right angle icon divider"></i> <a class="section">UC</a> <i
+			class="right angle icon divider"></i>
+		<div class="active section">Employee</div>
+	</div>
+	<br />
+	<br />
+
+	<table class="ui compact celled definition table">
+		<thead class="full-width">
+			<tr>
+				<th></th>
+				<th>NO</th>
+				<th>Name</th>
+				<th>Email</th>
+				<th>Phone</th>
+				<th>Gender</th>
+				<th>Action</th>
+			</tr>
+		</thead>
+		<tbody id="EmployeeItems">
+		</tbody>
+		<tfoot class="full-width">
+			<tr>
+				<th></th>
+				<th colspan="6" align="right">
+					<a onclick="add(); return false;"><i class="add user icon large green"></i></a>
+				</th>
+			</tr>
+		</tfoot>
+	</table>
+
+	<div id="delete_confirm_dialog" class="ui basic modal">
+		<div class="ui icon header">
+			<i class="warning sign icon yellow"></i>
+		</div>
+		<div class="content">
+			<p style="font-size: 25px; text-align:center;">You are sure to delete the employee ?</p>
+		</div>
+		<div class="actions">
+			<div class="ui red basic cancel inverted button">
+				<i class="remove icon"></i> No
+			</div>
+			<div class="ui green ok inverted button">
+				<i class="checkmark icon"></i> Yes
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript">
+$(function() {
+	init();
+});
+
+function init() {
+	$.ajax({
+		url : "api/employees",
+		method : "get",
+		contentType : "application/json; charset=UTF-8",
+		success : function(result) {
+			console.log(result);
+			if (result) {
+				fillTableContent(result);
+			}
+		},
+		error : function(result) {
+			console.log(result);
+		}
+	});
+}
+
+function fillTableContent(employees) {
+	if (!employees) {
+		return;
+	}
+	var html = "";
+	for (var i = 0; i < employees.length; i++) {
+		var employee = employees[i];
+		console.log(employee);
+		html += ""
+			+ "<tr>"
+			+ "  <td class=\"collapsing\">"
+			+ "    <div class=\"ui fitted slider checkbox\">"
+			+ "      <input uid=\"" + employee.mail + "\" class=\"checkbox\" type=\"checkbox\"> <label></label>"
+			+ "    </div>"
+			+ "  </td>"
+			+ "  <td>" + (employee.no || "-") + "</td>"
+			+ "  <td>" + (employee.name || "-") + "</td>"
+			+ "  <td>" + (employee.mail || "-") + "</td>"
+			+ "  <td>" + (employee.phone || "-") + "</td>"
+			+ "  <td>" + (employee.gender || "-") + "</td>"
+			+ "  <td>"
+			+ "    <a class=\"delete_button\" mail=\"" + employee.mail + "\"><i class=\"delete icon red\"></i></a>"
+			+ "    <span style=\"padding-left:10px;\">&nbsp;</span>"
+			+ "    <a class=\"edit_button\" mail=\"" + employee.mail + "\"><i class=\"edit icon\"></i></a>"
+			+ "  </td>"
+			+ "</tr>";
+	}
+	$("#EmployeeItems").empty().append(html);
+	for (var i = 0; i < employees.length; i++) {
+		var employee = employees[i];
+		$(".delete_button").off("click").on("click", function() {
+			remove($(this).attr("mail"));
+		});
+		$(".edit_button").off("click").on("click", function() {
+			edit($(this).attr("mail"));
+		});
+	}
+}
+
+function remove(mail) {
+	if (null == mail || 0 == mail.trim().length) {
+		return;
+	}
+	$("#delete_confirm_dialog").modal('show');
+	$("#delete_confirm_dialog .actions .button.ok").off("click").on("click", function() {
+		$.ajax({
+			url : "api/employees/" + mail,
+			method : "delete",
+			contentType : "application/json; charset=UTF-8",
+			success : function(result) {
+				console.log(result);
+				init();
+			},
+			error : function(result) {
+				console.log(result);
+			}
+		});
+		$("#delete_confirm_dialog .actions .button.ok").off("click");
+	});
+}
+
+function edit(mail) {
+	if (null == mail || 0 == mail.trim().length) {
+		return;
+	}
+	window.location.href = "edit.html?mail=" + mail;
+}
+
+function add() {
+	window.location.href = "new.html";
+}
+</script>
+</body>
+</html>

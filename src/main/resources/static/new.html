@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport"
+	content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>DevOps Example WEB Application</title>
+<link rel="stylesheet" type="text/css"
+	href="assets/semantic/semantic.min.css">
+<script src="assets/library/jquery.min.js"></script>
+<script src="assets/semantic/semantic.min.js"></script>
+<style>
+body {
+	padding: 1em;
+}
+
+.ui.menu {
+	margin: 3em 0em;
+}
+
+.ui.menu:last-child {
+	margin-bottom: 110px;
+}
+</style>
+
+<!--- Example Javascript -->
+<script>
+	$(document).ready(function() {
+		$('.ui.menu .ui.dropdown').dropdown({
+			on : 'hover'
+		});
+		$('.ui.menu a.item').on('click', function() {
+			$(this).addClass('active').siblings().removeClass('active');
+			console.log($(this).attr("id"));
+		});
+	});
+
+	function signout() {
+		$.ajax({
+			url : "api/employees/signout",
+			method : "put",
+			contentType : "application/json; charset=UTF-8",
+			success : function(result) {
+				if (result == true || result == "true") {
+					window.location.href = "signin.html";
+				}
+			},
+			error : function(result) {
+				console.log(result);
+			}
+		});
+	}
+</script>
+</head>
+<body>
+	<div class="ui inverted menu">
+		<a class="item" id="home" href="index.html"><i class="home icon"></i>Home</a>
+		<div class="ui dropdown item">
+			System <i class="dropdown icon"></i>
+			<div class="menu">
+				<a class="item" href="system.html">Environment</a>
+				<a class="item" href="configuration.html">Configuration</a>
+			</div>
+		</div>
+		<div class="right menu">
+			<div class="item">
+				<div class="ui transparent inverted icon input">
+					<i class="search icon"></i> <input type="text" placeholder="Search">
+				</div>
+			</div>
+			<a class="item" onclick="signout(); return false;"><i class="sign out icon"></i>
+			Sign-out</a>
+		</div>
+	</div>
+
+	<div class="ui large breadcrumb">
+		<a class="section" href="index.html">Home</a> <i class="right angle icon divider"></i> <a
+			class="section">UC</a> <i class="right angle icon divider"></i>
+		<div class="active section">Employee</div>
+	</div>
+	<br/>
+	<br/>
+
+	<form id="employeeForm" class="ui form">
+		<div class="field">
+			<label>NO.</label> <input type="text" name="no" id="no"
+				placeholder="Employee NO. (limit length 64)">
+		</div>
+		<div class="field">
+			<label>Name</label> <input type="text" name="name" id="name"
+				placeholder="Employee Name (limit length 64)">
+		</div>
+		<div class="field">
+			<label>Email</label> <input type="text" name="mail" id="mail"
+				onblur="validateEmail()" placeholder="Your Email (limit length 64)">
+		</div>
+		<div class="field">
+			<label>Password</label> <input type="password" name="password" id="password"
+				placeholder="Your Password (limit length 64)">
+		</div>
+		<div class="field">
+			<label>Phone</label> <input type="text" name="phone" id="phone"
+				placeholder="Your Phone NO. (limit length 16)">
+		</div>
+		<div class="field">
+			<label>Gender</label> <select name="gender" class="ui fluid dropdown">
+				<option value="M">Male</option>
+				<option value="F">Female</option>
+			</select>
+		</div>
+		<!-- 
+		<div class="field">
+			<div class="ui checkbox">
+				<input type="checkbox" tabindex="0" class="hidden"> <label>I
+					agree to the Terms and Conditions</label>
+			</div>
+		</div>
+		 -->
+		<a class="ui button" onclick="cancel(); return false;">Cancel</a>
+		<a class="ui button primary" onclick="submit(); return false;">Submit</a>
+	</form>
+
+	<div id="confirm_dialog" class="ui basic modal">
+		<div class="ui icon header">
+			<i class="warning sign icon yellow"></i>
+		</div>
+		<div class="content">
+			<p style="font-size: 25px; text-align:center;">You are sure to add the employee ?</p>
+		</div>
+		<div class="actions">
+			<div class="ui red basic cancel inverted button">
+				<i class="remove icon"></i> No
+			</div>
+			<div class="ui green ok inverted button">
+				<i class="checkmark icon"></i> Yes
+			</div>
+		</div>
+	</div>
+
+<script type="text/javascript">
+function validateEmail() {
+	var mail = $("#employeeForm #mail").val();
+	if (null == mail || 0 == mail.trim().length) {
+		return false;
+	}
+	$.ajax({
+		url : "api/employees/" + mail,
+		method : "get",
+		contentType : "application/json; charset=UTF-8",
+		async: false,
+		success : function(result) {
+			if (result) {
+				$("#employeeForm #mail").val("");
+				alert("Email " + mail + " already in use.");
+			}
+		},
+		error : function(result) {
+			console.log(result);
+		}
+	});
+}
+
+function validate() {
+	var no = $("#employeeForm #no").val();
+	if (null == no || 0 == no.trim().length || 64 < no.length) {
+		return false;
+	}
+	var name = $("#employeeForm #name").val();
+	if (null == name || 0 == name.trim().length || 64 < name.length) {
+		return false;
+	}
+	var mail = $("#employeeForm #mail").val();
+	if (null == mail || 0 == mail.trim().length || 64 < mail.length) {
+		return false;
+	}
+	var password = $("#employeeForm #password").val();
+	if (null == password || 0 == password.trim().length || 64 < password.length) {
+		return false;
+	}
+	var phone = $("#employeeForm #phone").val();
+	if (null == phone || 0 == phone.trim().length || 16 < phone.length) {
+		return false;
+	}
+	return true;
+}
+
+function submit() {
+	if (!validate()) {
+		return false;
+	}
+	$.fn.serializeObject = function()
+	{
+	    var o = {};
+	    var a = this.serializeArray();
+	    $.each(a, function() {
+	        if (o[this.name] !== undefined) {
+	            if (!o[this.name].push) {
+	                o[this.name] = [o[this.name]];
+	            }
+	            o[this.name].push(this.value || '');
+	        } else {
+	            o[this.name] = this.value || '';
+	        }
+	    });
+	    return o;
+	};
+	var data = $("#employeeForm").serializeObject();
+	console.log("form", data);
+	// Pop Dialog
+	$("#confirm_dialog").modal('show');
+	$("#confirm_dialog .actions .button.ok").off("click").on("click", function() {
+		$.ajax({
+			url : "api/employees",
+			method : "post",
+			data: JSON.stringify({
+		        no: data.no || "",
+		        name: data.name || "",
+		        mail: data.mail || "",
+		        password: data.password || "",
+		        phone: data.phone || "",
+		        gender: data.gender || ""
+		      }),
+			dataType: "json",
+			contentType : "application/json; charset=UTF-8",
+			success : function(result) {
+				window.location.href = "index.html";
+			},
+			error : function(result) {
+				console.log(result);
+			}
+		});
+		$("#confirm_dialog .actions .button.ok").off("click");
+	});
+}
+
+function cancel() {
+	//window.history.back();
+	window.location.href = "index.html";
+}
+</script>
+</body>
+</html>

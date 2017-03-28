@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport"
+	content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>DevOps Example WEB Application</title>
+<link rel="stylesheet" type="text/css"
+	href="assets/semantic/semantic.min.css">
+<script src="assets/library/jquery.min.js"></script>
+<script src="assets/semantic/semantic.min.js"></script>
+<style>
+body {
+	padding: 1em;
+}
+
+.ui.menu {
+	margin: 3em 0em;
+}
+
+.ui.menu:last-child {
+	margin-bottom: 110px;
+}
+</style>
+
+<!--- Example Javascript -->
+<script>
+	$(document).ready(function() {
+		$('.ui.menu .ui.dropdown').dropdown({
+			on : 'hover'
+		});
+		$('.ui.menu a.item').on('click', function() {
+			$(this).addClass('active').siblings().removeClass('active');
+			console.log($(this).attr("id"));
+		});
+	});
+
+	function signout() {
+		$.ajax({
+			url : "api/employees/signout",
+			method : "put",
+			contentType : "application/json; charset=UTF-8",
+			success : function(result) {
+				if (result == true || result == "true") {
+					window.location.href = "signin.html";
+				}
+			},
+			error : function(result) {
+				console.log(result);
+			}
+		});
+	}
+</script>
+</head>
+<body>
+	<div class="ui inverted menu">
+		<a class="item" id="home" href="index.html"><i class="home icon"></i>Home</a>
+		<div class="ui dropdown item">
+			System <i class="dropdown icon"></i>
+			<div class="menu">
+				<a class="item" href="system.html">Environment</a>
+				<a class="item" href="configuration.html">Configuration</a>
+			</div>
+		</div>
+		<div class="right menu">
+			<div class="item">
+				<div class="ui transparent inverted icon input">
+					<i class="search icon"></i> <input type="text" placeholder="Search">
+				</div>
+			</div>
+			<a class="item" onclick="signout(); return false;"><i class="sign out icon"></i>
+			Sign-out</a>
+		</div>
+	</div>
+
+	<div class="ui large breadcrumb">
+		<a class="section" href="index.html">Home</a> <i
+			class="right angle icon divider"></i> <a class="section">System</a> <i
+			class="right angle icon divider"></i>
+		<div class="active section">Environment</div>
+	</div>
+	<br/>
+	<br/>
+	<a class="ui button">OS Environments</a>
+	<table class="ui single line table">
+		<thead class="full-width">
+			<tr>
+				<th><i class="lock icon large"></i>Environment Variable</th>
+				<th><i class="content icon large"></i>Variable Value</th>
+			</tr>
+		</thead>
+		<tbody id="os_environments">
+		</tbody>
+	</table>
+	<br />
+	<a class="ui button">JVM Environments</a>
+	<table class="ui single line table">
+		<thead class="full-width">
+			<tr>
+				<th><i class="lock icon large"></i>Environment Variable</th>
+				<th><i class="content icon large"></i>Variable Value</th>
+			</tr>
+		</thead>
+		<tbody id="jvm_environments">
+		</tbody>
+	</table>
+	<script type="text/javascript">
+		$(function() {
+			init();
+		});
+
+		function init() {
+			$.ajax({
+				url : "api/configurations/environments",
+				method : "get",
+				contentType : "application/json; charset=UTF-8",
+				success : function(result) {
+					console.log(result);
+					if (result) {
+						fillTableContent(result, "os_environments");
+					}
+				},
+				error : function(result) {
+					console.log(result);
+				}
+			});
+			$.ajax({
+				url : "api/configurations/systems",
+				method : "get",
+				contentType : "application/json; charset=UTF-8",
+				success : function(result) {
+					console.log(result);
+					if (result) {
+						fillTableContent(result, "jvm_environments");
+					}
+				},
+				error : function(result) {
+					console.log(result);
+				}
+			});
+		}
+
+		function fillTableContent(environments, tbody) {
+			if (!environments) {
+				return;
+			}
+			var html = "";
+			for (i in environments) {
+				html += "" + "<tr>" + "  <td>" + i + "</td>" + "  <td>"
+						+ environments[i] + "</td>" + "</tr>";
+			}
+			$("#" + tbody).empty().append(html);
+		}
+	</script>
+</body>
+</html>
