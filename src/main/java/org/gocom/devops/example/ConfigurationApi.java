@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.io.IOUtils;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -39,7 +40,7 @@ public class ConfigurationApi {
 	}
 	
 	@RequestMapping(value = "/jdbc", method = RequestMethod.PUT)
-	public boolean setJdbcConfiguration(JdbcConfiguration configuration) throws ApiException {
+	public boolean setJdbcConfiguration(@RequestBody JdbcConfiguration configuration) throws ApiException {
 		DbUtils.DB_INFO.setProperty("jdbc_url", configuration.getUrl());
 		DbUtils.DB_INFO.setProperty("jdbc_user", configuration.getUser());
 		DbUtils.DB_INFO.setProperty("jdbc_password", configuration.getPassword());

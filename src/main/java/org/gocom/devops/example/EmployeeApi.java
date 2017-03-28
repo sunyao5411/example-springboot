@@ -16,11 +16,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.websocket.server.PathParam;
 
 import org.apache.commons.lang.StringUtils;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -42,8 +43,8 @@ public class EmployeeApi {
 	
 	private static String SQL_QUERY = "SELECT `id`, `no`, `name`, `mail`, `password`, `phone`, `gender` FROM `employee`";
 	
-	@RequestMapping(value = "/", method = RequestMethod.POST)
-	public Employee add(Employee employee) throws ApiException {
+	@RequestMapping(method = RequestMethod.POST)
+	public Employee add(@RequestBody Employee employee) throws ApiException {
 		if (null == employee || StringUtils.isBlank(employee.getMail())) {
 			return null;
 		}
@@ -69,8 +70,8 @@ public class EmployeeApi {
 		}
 	}
 	
-	@RequestMapping(value = "/", method = RequestMethod.PUT)
-	public Employee update(Employee employee) throws ApiException {
+	@RequestMapping(method = RequestMethod.PUT)
+	public Employee update(@RequestBody Employee employee) throws ApiException {
 		if (null == employee || StringUtils.isBlank(employee.getMail())) {
 			return null;
 		}
@@ -93,8 +94,8 @@ public class EmployeeApi {
 		}
 	}
 	
-	@RequestMapping(value = "/{mail}", method = RequestMethod.GET)
-	public Employee get(@PathParam("mail") String mail) throws ApiException {
+	@RequestMapping(value="/get", method = RequestMethod.GET)
+	public Employee get(@RequestParam("mail") String mail) throws ApiException {
 		if (StringUtils.isBlank(mail)) {
 			return null;
 		}
@@ -125,7 +126,7 @@ public class EmployeeApi {
 		return null;
 	}
 	
-	@RequestMapping(value = "/", method = RequestMethod.GET)
+	@RequestMapping(method = RequestMethod.GET)
 	public List<Employee> query() throws ApiException {
 		List<Employee> results = new ArrayList<>();
 		Connection connection = null;
@@ -155,8 +156,8 @@ public class EmployeeApi {
 		return results;
 	}
 	
-	@RequestMapping(value = "/{mail}", method = RequestMethod.DELETE)
-	public Employee remove(@PathParam("mail") String mail) throws ApiException {
+	@RequestMapping(method = RequestMethod.DELETE)
+	public Employee remove(@RequestParam("mail") String mail) throws ApiException {
 		if (StringUtils.isBlank(mail)) {
 			return null;
 		}
@@ -179,7 +180,7 @@ public class EmployeeApi {
 	}
 
 	@RequestMapping(value = "/signin", method = RequestMethod.PUT)
-	public boolean signin(Employee employee, HttpServletRequest request) throws ApiException {
+	public boolean signin(@RequestBody Employee employee, HttpServletRequest request) throws ApiException {
 		if (null != employee && null == request.getSession().getAttribute(Employee.class.getSimpleName())) {
 			Employee e = get(employee.getMail());
 			if (null == e) {

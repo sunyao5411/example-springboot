@@ -192,7 +192,7 @@ function remove(mail) {
 	$("#delete_confirm_dialog").modal('show');
 	$("#delete_confirm_dialog .actions .button.ok").off("click").on("click", function() {
 		$.ajax({
-			url : "api/employees/" + mail,
+			url : "api/employees/?mail=" + mail,
 			method : "delete",
 			contentType : "application/json; charset=UTF-8",
 			success : function(result) {

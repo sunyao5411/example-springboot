@@ -157,7 +157,7 @@ body {
 			return;
 		}
 		$.ajax({
-			url : "api/employees/" + mail,
+			url : "api/employees/get?mail=" + mail,
 			method : "get",
 			contentType : "application/json; charset=UTF-8",
 			async : false,
