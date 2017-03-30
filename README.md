@@ -4,7 +4,7 @@
 ## MySQL Configuration
 
 	# Priority 0
-	# Visit http://localhost:8080/app/configuration.html and configure jdbc
+	# Visit http://localhost:9999/configuration.html and configure jdbc
 	
 	# Priority 1
 	# /WEB-INF/classes/jdbc.properties
